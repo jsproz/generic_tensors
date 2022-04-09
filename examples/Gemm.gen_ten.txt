@@ -1,0 +1,25 @@
+%func Gemm( a: Float32[2*3], b: Float32[3*2], c: Float32[2*2] )
+      -> ( y: Float32[2*2] )
+{
+  
+  ( transposeA ) = transpose( a ) [ "perms" : [ 1, 0 ] ]
+  ( transposeB ) = transpose( b ) [ "perms" : [ 1, 0 ] ]
+  ( matMulTransposeATransposeB ) = matmul( transposeA, transposeB )
+  ( matMulMatMulTransposeATransposeBAlpha ) = matmul( matMulTransposeATransposeB, alpha )
+  ( matMulCBeta ) = matmul( c, beta )
+  ( result ) = add( matMulMatMulTransposeATransposeBAlpha, matMulCBeta )
+  ( y ) = identity( result )
+  
+  %var transposeA: Float32[3*2]
+  %var transposeB: Float32[2*3]
+  %var alpha: Float32[1] = [
+    1
+  ]
+  %var beta: Float32[1] = [
+    1
+  ]
+  %var matMulTransposeATransposeB: Float32[2*2]
+  %var matMulMatMulTransposeATransposeBAlpha: Float32[2*2]
+  %var matMulCBeta: Float32[2*2]
+  %var result: Float32[2*2]
+}

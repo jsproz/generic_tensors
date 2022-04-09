@@ -1,0 +1,355 @@
+
+%scanner
+
+*<white>:
+        1*whiteSpace
+    ;
+
+whiteSpace:
+        whiteCharacter
+    |   multipleLineComment
+    |   singleLineComment
+    ;
+
+whiteCharacter:
+        " \t"
+    |   newLine
+    ;
+
+newLine:
+        "\r" "\n"
+    |   "\r"
+    |   "\n"
+    ;
+
+singleLineComment:
+        "/" "/" *singleLineCommentElement
+    ;
+
+singleLineCommentElement:
+        ~"\n\r"
+    ;
+
+multipleLineComment:
+        "/" "*" *multipleLineCommentElement multipleLineCommentEnd
+    ;
+
+multipleLineCommentElement:
+        ~nonmultipleLineCommentElement
+    |   multipleLineComment
+    ;
+
+nonmultipleLineCommentElement:
+        multipleLineCommentEnd
+    |   multipleLineComment
+    ;
+
+multipleLineCommentEnd:
+        "*" "/"
+    ;
+
+<string>:
+        "\"" *quotedTextItem "\""
+    ;
+
+quotedTextItem:
+        quotedTextItemCharacter
+    |   escapedCharacter
+    ;
+
+quotedTextItemCharacter:
+        ~nonquotedTextItemCharacter
+    ;
+
+nonquotedTextItemCharacter:
+        "\"\r\n\\"
+    ;
+
+escapedCharacter:
+        escapedUnicodeScalar
+    |   escapedCCharacter
+    ;
+
+escapedUnicodeScalar:
+        "\\" "u" "{" 1*8unicodeScalarDigit "}"
+    ;
+
+unicodeScalarDigit:
+        "0123456789abcdefABCDEF"
+    ;
+
+escapedCCharacter:
+        "\\" "0\\tnr\"'"
+    ;
+
+<identifier>:
+        "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ" *identifierFollower
+    ;
+
+identifierFollower:
+        "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    ;
+
+<integer>:
+        *1"-" "0"
+    |   *1"-" "123456789" *digit
+    ;
+
+<floatingPoint>:
+        *1"-" fractionalConstant *1exponentPart
+    |   *1"-" digitSequence exponentPart
+    ;
+
+fractionalConstant:
+        *1digitSequence "." digitSequence
+    |   digitSequence "."
+    ;
+
+exponentPart:
+        "eE" *1"+-" digitSequence
+    ;
+
+digitSequence:
+        1*digit
+    ;
+
+digit:
+        "0123456789"
+    ;
+
+<leftBrace>=
+        "{"
+    ;
+
+<rightBrace>=
+        "}"
+    ;
+
+<leftBracket>=
+        "["
+    ;
+
+<rightBracket>=
+        "]"
+    ;
+
+<arrow>=
+        "->"
+    ;
+
+<leftParenthesis>=
+        "("
+    ;
+
+<rightParenthesis>=
+        ")"
+    ;
+
+<leftAngle>=
+        "<"
+    ;
+
+<rightAngle>=
+        ">"
+    ;
+
+<asterisk>=
+        "*"
+    ;
+
+<comma>=
+        ","
+    ;
+
+<colon>=
+        ":"
+    ;
+
+<equalSign>=
+        "="
+    ;
+
+<period>=
+        "."
+    ;
+
+<funcLiteral>=
+        "%func"
+    ;
+
+<varLiteral>=
+        "%var"
+    ;
+
+<dataTypeFloat32>=
+        "Float32"
+    ;
+
+<dataTypeInt64>=
+        "Int64"
+    ;
+
+<quesionMark>=
+        "?"
+    ;
+
+%parser
+
+*
+program:
+        function $
+    ;
+
+function:
+        "%func" functionName inputPhrase "->" outputPhrase "{" *statement "}"
+    ;
+
+functionName:
+        <identifier>
+    ;
+
+inputPhrase:
+        "(" *parameter( "," ) ")"
+    ;
+
+parameter:
+        parameterName ":" tensor
+    ;
+
+parameterName:
+        <identifier>
+    ;
+
+outputPhrase:
+        "(" *result( "," ) ")"
+    ;
+
+result:
+        resultName ":" tensor
+    ;
+
+resultName:
+        <identifier>
+    ;
+
+statement:
+        variable
+    |   operation
+    |   function
+    ;
+
+variable:
+        "%var" variableName ":" tensor *1initializer
+    ;
+
+variableName:
+        <identifier>
+    ;
+
+operation:
+        resultPhrase "=" operationName argumentPhrase *1attributes
+    ;
+
+resultPhrase:
+        "(" *output( "," ) ")"
+    ;
+
+output:
+        <identifier>
+    ;
+
+operationName:
+        <identifier>
+    ;
+
+argumentPhrase:
+        "(" *input( "," ) ")"
+    ;
+
+input:
+        <identifier>
+    ;
+
+initializer:
+        "=" tensorValue
+    ;
+
+tensorValue:
+        "[" 1*constantValue( "," ) "]"
+    ;
+
+constantValue:
+        numberValue
+    |   tensorValue
+    |   stringValue
+    ;
+
+tensor:
+        dataType "[" *dimension( "*" ) "]"
+    ;
+
+dataType:
+        "Float32"
+    |   "Int64"
+    |   "?"
+    ;
+
+dimension:
+        integerDimension
+    |   variableDimension
+    |   unknownDimension
+    ;
+
+integerDimension:
+        <integer>
+    ;
+
+variableDimension:
+        <identifier>
+    ;
+
+unknownDimension:
+        "?"
+    ;
+
+attributes:
+        "[" 1*attributePair( "," ) "]"
+    ;
+
+attributePair:
+        attributeKey ":" attributeValue
+    ;
+
+attributeKey:
+        <string>
+    ;
+
+attributeValue:
+        arrayValue
+    |   numberValue
+    |   stringValue
+    |   referenceValue
+    ;
+
+arrayValue:
+        "[" 1*numberStringValue( "," ) "]"
+    ;
+
+numberStringValue:
+        numberValue
+    |   referenceValue
+    |   stringValue
+    ;
+
+stringValue:
+        <string>
+    ;
+
+numberValue:
+        integer
+    |   floatingPoint
+    ;
+
+referenceValue:
+        <identifier>
+    ;

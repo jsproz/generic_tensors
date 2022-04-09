@@ -1,0 +1,141 @@
+
+%dialect dmir
+
+%enumeration DataType
+    
+    %element float32
+    %literal "Float32"
+    
+    %element int64
+    %literal "Int64"
+    
+    %element string
+    %literal "String"
+
+%node Program
+    %description "Program"
+    %element function Function
+
+%node Function
+    %description "Function"
+    %element functionName String
+    %element parameter [Parameter]
+    %element result [Result]
+    %element variable [Variable]
+    %element function [Function]
+    %element operation [Operation]
+
+%node Tensor
+    %description "Tensor"
+    %element dimension [Int64]
+    %element dataType DataType
+
+%node Subtensor
+    %description "Subensor"
+    %element dimension [Int64]
+    %element coordinate [Int64]
+    %element tensor Tensor
+
+%node Parameter
+    %description "Parameter"
+    %element parameterName String
+    %element tensor Tensor
+
+%node Result
+    %description "Result"
+    %element resultName String
+    %element tensor Tensor
+
+%node Variable
+    %description "Variable"
+    %element variableName String
+    %element tensor Tensor
+    %element tensorValue TensorValue
+
+%node TensorValue
+    %description "TensorValue"
+    %child tensorIntValue TensorIntValue
+    %child tensorFloatValue TensorFloatValue
+    %child tensorStringValue TensorStringValue
+
+%node TensorIntValue
+    %description "TensorIntValue"
+    %element intValue [Int64]
+
+%node TensorFloatValue
+    %description "TensorFloatValue"
+    %element floatValue [Float32]
+
+%node TensorStringValue
+    %description "TensorStringValue"
+    %element stringValue [String]
+
+%node AttributePair
+    %description "AttributePair"
+    %element attributeKey String
+    %element attributeValue AttributeValue
+
+%node AttributeValue
+    %description "AttributeValue"
+    
+    %child attributeInt64Value AttributeInt64Value
+    %child attributeInt64ArrayValue AttributeInt64ArrayValue
+    
+    %child attributeFloatValue AttributeFloatValue
+    %child attributeFloatArrayValue AttributeFloatArrayValue
+    
+    %child attributeStringValue AttributeStringValue
+    %child attributeStringArrayValue AttributeStringArrayValue
+
+    %child attributeVariableValue AttributeVariableValue
+    %child attributeVariableArrayValue AttributeVariableArrayValue
+
+    %child attributeFunctionValue AttributeFunctionValue
+    %child attributeFunctionArrayValue AttributeFunctionArrayValue
+
+%node AttributeInt64Value
+    %description "AttributeInt64Value"
+    %element int64Value Int64
+
+%node AttributeInt64ArrayValue
+    %description "AttributeInt64ArrayValue"
+    %element int64Value [Int64]
+
+%node AttributeFloatValue
+    %description "AttributeFloatValue"
+    %element floatValue Float32
+
+%node AttributeFloatArrayValue
+    %description "AttributeFloatArrayValue"
+    %element floatValue [Float32]
+
+%node AttributeStringValue
+    %description "AttributeStringValue"
+    %element stringValue String
+
+%node AttributeStringArrayValue
+    %description "AttributeStringArrayValue"
+    %element stringValue [String]
+
+%node AttributeVariableValue
+    %description "AttributeVariableValue"
+    %element variableValue String
+
+%node AttributeVariableArrayValue
+    %description "AttributeVariableArrayValue"
+    %element variableValue [String]
+
+%node AttributeFunctionValue
+    %description "AttributeFunctionValue"
+    %element functionValue String
+
+%node AttributeFunctionArrayValue
+    %description "AttributeFunctionArrayValue"
+    %element functionValue [String]
+
+%node Operation
+    %description "Operation"
+    %element outputName [String]
+    %element operationName String
+    %element inputName [String]
+    %element attributePair [AttributePair]
