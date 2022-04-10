@@ -8,6 +8,7 @@ demonstration and not particularly useful. It does very little error checking.
 ### Running Ubuntu
 
 ```bash
+$ mkdir /Users/<user-name>/gen_ten
 $ docker run \
 --name ubuntu \
 -e HOST_IP=$(ifconfig en0 | awk '/ *inet /{print $2}') \
@@ -33,37 +34,37 @@ $ apt-get install -y build-essential git cmake clang llvm
 Checkout hash is last tested, newer ones may work too.
 
 ```bash
-cd /gen-ten
-git clone https://github.com/llvm/llvm-project.git
-cd llvm-project
-git checkout ff758372bd51840b4f566968fb0929d19557dd9b
-mkdir build
-cd build
-cmake -G "Unix Makefiles" ../llvm \
--DLLVM_ENABLE_PROJECTS="clang;mlir;libcxx;libcxxabi" \
--DLLVM_BUILD_EXAMPLES=ON \
--DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
--DCMAKE_BUILD_TYPE=Release \
--DLLVM_ENABLE_ASSERTIONS=ON \
--DLLVM_ENABLE_RTTI=ON \
--DCMAKE_C_COMPILER=/usr/bin/clang \
--DCMAKE_CXX_COMPILER=/usr/bin/clang++
-cmake --build . -j8
-cmake --build . --target check-mlir
-export LLVM_PROJ_BUILD=$PWD
+$ cd /gen_ten
+$ git clone https://github.com/llvm/llvm-project.git
+$ cd llvm-project
+$ git checkout ff758372bd51840b4f566968fb0929d19557dd9b
+$ mkdir build
+$ cd build
+$ cmake -G "Unix Makefiles" ../llvm \
+  -DLLVM_ENABLE_PROJECTS="clang;mlir;libcxx;libcxxabi" \
+  -DLLVM_BUILD_EXAMPLES=ON \
+  -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLLVM_ENABLE_ASSERTIONS=ON \
+  -DLLVM_ENABLE_RTTI=ON \
+  -DCMAKE_C_COMPILER=/usr/bin/clang \
+  -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+$ cmake --build . -j8
+$ cmake --build . --target check-mlir
+$ export LLVM_PROJ_BUILD=$PWD
 ```
 
 ## Building generic-tensors
 
 This setup assumes that you have built LLVM and MLIR in `$LLVM_PROJ_BUILD`. To build and launch the tests, run
-```sh
-mkdir build && cd build
-cmake -G "Unix Makefiles" .. -DMLIR_DIR=$LLVM_PROJ_BUILD/lib/cmake/mlir -DLLVM_EXTERNAL_LIT=$LLVM_PROJ_BUILD/bin/llvm-lit
-cmake --build . -j8
+```bash
+$ mkdir build && cd build
+$ cmake -G "Unix Makefiles" .. -DMLIR_DIR=$LLVM_PROJ_BUILD/lib/cmake/mlir -DLLVM_EXTERNAL_LIT=$LLVM_PROJ_BUILD/bin/llvm-lit
+$ cmake --build . -j8
 ```
 To build the documentation from the TableGen description of the dialect operations, run
-```sh
-cmake --build . --target mlir-doc
+```bash
+$ cmake --build . --target mlir-doc
 ```
 
 ## Using generic-tensors
