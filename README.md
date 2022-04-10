@@ -112,3 +112,11 @@ There is an example file in the examples folder.
   %var result: Float32[2*2]
 }
 ```
+
+```bash
+$ ./bin/generic-tensors -help
+$ ./bin/generic-tensors -dump-tokens ../examples/Gemm.gen_ten.txt 
+$ ./bin/generic-tensors -dump-parsed ../examples/Gemm.gen_ten.txt 
+$ ./bin/generic-tensors -dump-mlir ../examples/Gemm.gen_ten.txt 
+$ ./bin/generic-tensors -dump-mlir -clean-up ../examples/Gemm.gen_ten.txt 
+```
