@@ -1,5 +1,5 @@
 
-%dialect dmir
+%dialect gen_ten
 
 %enumeration DataType
     
